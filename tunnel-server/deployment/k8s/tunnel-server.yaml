@@ -20,7 +20,7 @@ spec:
       - name: tls-cert
         secret:
           defaultMode: 400
-          secretName: tunnel-server-tls
+          secretName: preevy-tunnel-certificate
       containers:
       - env:
         - name: COOKIE_SECRETS
@@ -86,7 +86,7 @@ kind: Service
 metadata:
   name: tunnel-server
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
   - name: tls
     port: 443
@@ -98,3 +98,26 @@ spec:
     targetPort: 8888
   selector:
     app: tunnel-server
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: review-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "*.review.paper.hivelabs.link"
+      http:
+        paths:
+          - backend:
+              service:
+                name: tunnel-server
+                port:
+                  number: 443
+            path: /
+            pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - "*.review.paper.hivelabs.link"

@@ -4,11 +4,6 @@ resources:
 - tunnel-server.yaml
 secretGenerator:
 - files:
-  - tls.crt
-  - tls.key
-  name: tunnel-server-tls
-  type: kubernetes.io/tls
-- files:
   - ssh_host_key
   name: tunnel-server-ssh
   type: Opaque
